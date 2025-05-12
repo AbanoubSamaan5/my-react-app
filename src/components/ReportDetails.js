@@ -25,7 +25,7 @@ const ReportDetails = ({ record, report, center }) => {
       </div>
       <div style={styles.row}>
         <div style={styles.item}>
-          <strong>Created At:</strong> {new Date(report?.createdAt).toLocaleString()}
+          <strong>Created At:</strong> {new Date(report?.createdAt).toLocaleDateString() || 'N/A'}
         </div>
         <div style={styles.item}>
           <strong>Body Part:</strong> {record.body_part_examined || 'N/A'}
