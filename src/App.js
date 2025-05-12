@@ -5,11 +5,10 @@ import RecordPage from './pages/RecordPage';
 
 const App = () => {
   return (
-    <Router>
+    <Router basename="/my-react-app">
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/showReport/:recordId" element={<RecordPage />} />
-        {/* أضف هنا باقي الصفحات لو عندك */}
       </Routes>
     </Router>
   );
