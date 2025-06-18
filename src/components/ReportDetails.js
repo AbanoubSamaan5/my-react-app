@@ -1,6 +1,8 @@
 import React, { useRef } from 'react';
 import DownloadPdfButton from './DownloadPdfButton'; // Import the DownloadPdfButton component
+
 const ReportDetails = ({ record, report, center }) => {
+
   const reportRef = useRef(); // Create a ref for the report content
   return (
     <div ref={reportRef} style={styles.container}>
@@ -25,7 +27,14 @@ const ReportDetails = ({ record, report, center }) => {
       </div>
       <div style={styles.row}>
         <div style={styles.item}>
-          <strong>Created At:</strong> {new Date(report?.createdAt).toLocaleDateString() || 'N/A'}
+          <strong>Created At:</strong>{' '}
+          {report?.createdAt
+            ? new Date(report.createdAt).toLocaleDateString('en-GB', {
+              day: '2-digit',
+              month: '2-digit',
+              year: 'numeric'
+            })
+            : 'N/A'}
         </div>
         <div style={styles.item}>
           <strong>Body Part:</strong> {record.body_part_examined || 'N/A'}
@@ -48,10 +57,14 @@ const ReportDetails = ({ record, report, center }) => {
       </div>
 
       {/* Add the Download PDF button */}
+
       <DownloadPdfButton
+        record={record}
         targetRef={reportRef}
         fileName="diagnosis_report.pdf"
       />
+
+
     </div>
 
   );

@@ -44,7 +44,7 @@ const RecordPage = () => {
   if (loading) {
     return (
       <div style={styles.wrapper}>
-        <div style={styles.card}>loading Date...</div>
+        <div style={styles.card}>loading Data...</div>
       </div>
     );
   }
