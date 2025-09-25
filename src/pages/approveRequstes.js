@@ -28,8 +28,27 @@ const ActionPage = ({ actionType }) => {
   return (
     <div style={styles.wrapper}>
       <div style={styles.card}>
-        {status === 'loading' && 'Processing your request... ⏳'}
-        {status !== 'loading' && <p>{message}</p>}
+        {status === 'loading' && (
+          <div style={styles.loadingContent}>
+            <div style={styles.icon}>⏳</div>
+            <h3 style={styles.title}>Processing Request</h3>
+            <p style={styles.subtitle}>Please wait while we process your request...</p>
+          </div>
+        )}
+        {status === 'success' && (
+          <div style={styles.successContent}>
+            <div style={styles.icon}>✅</div>
+            <h3 style={styles.title}>Success!</h3>
+            <p style={styles.subtitle}>{message}</p>
+          </div>
+        )}
+        {status === 'error' && (
+          <div style={styles.errorContent}>
+            <div style={styles.icon}>❌</div>
+            <h3 style={styles.title}>Error</h3>
+            <p style={styles.subtitle}>{message}</p>
+          </div>
+        )}
       </div>
     </div>
   );
@@ -38,21 +57,54 @@ const ActionPage = ({ actionType }) => {
 const styles = {
   wrapper: {
     minHeight: '100vh',
-    background: 'linear-gradient(to right, #ece9e6, #ffffff)',
+    background: '#f8f9fa',
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
-    padding: '40px 20px',
+    padding: '20px',
   },
   card: {
     width: '100%',
-    maxWidth: '600px',
-    background: '#fff',
-    padding: '30px',
-    borderRadius: '12px',
-    boxShadow: '0 6px 18px rgba(0,0,0,0.1)',
+    maxWidth: '400px',
+    background: 'white',
+    padding: '40px',
+    borderRadius: '8px',
+    boxShadow: '0 2px 10px rgba(0, 0, 0, 0.1)',
+    border: '1px solid #ddd',
     textAlign: 'center',
-    fontSize: '18px',
+  },
+  loadingContent: {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    gap: '15px',
+  },
+  successContent: {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    gap: '15px',
+  },
+  errorContent: {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    gap: '15px',
+  },
+  icon: {
+    fontSize: '3rem',
+    marginBottom: '10px',
+  },
+  title: {
+    fontSize: '1.5rem',
+    fontWeight: '600',
+    color: '#333',
+    marginBottom: '10px',
+  },
+  subtitle: {
+    fontSize: '1rem',
+    color: '#666',
+    lineHeight: '1.5',
   },
 };
 

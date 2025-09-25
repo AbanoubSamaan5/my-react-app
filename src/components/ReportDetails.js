@@ -1,9 +1,30 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import DownloadPdfButton from './DownloadPdfButton'; // Import the DownloadPdfButton component
+import { explainReport } from '../services/geminiService';
 
 const ReportDetails = ({ record, report, center }) => {
-
   const reportRef = useRef(); // Create a ref for the report content
+  const [explanation, setExplanation] = useState(null);
+  const [isLoadingExplanation, setIsLoadingExplanation] = useState(false);
+  const [explanationError, setExplanationError] = useState(null);
+
+  const handleExplainReport = async () => {
+    setIsLoadingExplanation(true);
+    setExplanationError(null);
+    
+    try {
+      const findings = report?.diagnosisReportFinding || '';
+      const impression = report?.diagnosisReportImpration || '';
+      
+      const result = await explainReport(findings, impression);
+      setExplanation(result);
+    } catch (error) {
+      setExplanationError(error.message);
+      console.error('Error getting explanation:', error);
+    } finally {
+      setIsLoadingExplanation(false);
+    }
+  };
   return (
     <div ref={reportRef} style={styles.container}>
       <h2 style={styles.title}>{center?.data?.centerName || 'No Center Name'}</h2>
@@ -56,14 +77,53 @@ const ReportDetails = ({ record, report, center }) => {
         <p>{report?.diagnosisReportComment || 'No comments yet.'}</p>
       </div>
 
-      {/* Add the Download PDF button */}
+      {/* AI Explanation Section */}
+      <div style={styles.section}>
+        <div style={styles.explanationHeader}>
+          <strong>AI Explanation:</strong>
+          <button 
+            onClick={handleExplainReport}
+            disabled={isLoadingExplanation}
+            style={{
+              ...styles.explainButton,
+              ...(isLoadingExplanation ? styles.explainButtonDisabled : {})
+            }}
+          >
+            {isLoadingExplanation ? 'Generating...' : 'Explain Report'}
+          </button>
+        </div>
+        
+        {explanationError && (
+          <div style={styles.errorMessage}>
+            Error: {explanationError}
+          </div>
+        )}
+        
+        {explanation && (
+          <div style={styles.explanationContent}>
+            <div style={styles.explanationText}>
+              <strong>Patient Explanation:</strong>
+              <p style={styles.explanationTextParagraph}>{explanation.patient_explanation}</p>
+            </div>
+            <div style={styles.explanationMeta}>
+              <small>
+                Language: {explanation.language} | 
+                Generated: {new Date(explanation.timestamp).toLocaleString()}
+              </small>
+            </div>
+            <div style={styles.disclaimer}>
+              <small>{explanation.disclaimer}</small>
+            </div>
+          </div>
+        )}
+      </div>
 
+      {/* Add the Download PDF button */}
       <DownloadPdfButton
         record={record}
         targetRef={reportRef}
         fileName="diagnosis_report.pdf"
       />
-
 
     </div>
 
@@ -74,33 +134,113 @@ const styles = {
   container: {
     display: 'flex',
     flexDirection: 'column',
-    gap: '20px',
+    gap: '24px',
+    padding: '32px',
+    maxWidth: '1200px',
+    margin: '0 auto',
   },
   title: {
-    fontSize: '1.8rem',
+    fontSize: '2.5rem',
     textAlign: 'center',
-    marginBottom: '10px',
-    color: '#333',
+    marginBottom: '32px',
+    color: '#1e293b',
+    fontWeight: '700',
+    letterSpacing: '-0.025em',
   },
   row: {
-    display: 'flex',
-    flexWrap: 'wrap',
+    display: 'grid',
+    gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
     gap: '20px',
-    justifyContent: 'space-between',
   },
   item: {
-    flex: '1 1 20%',
-    background: '#f5f5f5',
-    padding: '10px 15px',
-    borderRadius: '8px',
-    boxShadow: '0 2px 4px rgba(0,0,0,0.05)',
-    minWidth: '300px',
+    background: 'linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%)',
+    padding: '20px',
+    borderRadius: '12px',
+    border: '1px solid #e2e8f0',
+    boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
+    transition: 'all 0.2s ease',
   },
   section: {
-    background: '#fdfdfd',
-    padding: '15px 20px',
+    background: 'white',
+    padding: '28px',
+    borderRadius: '12px',
+    border: '1px solid #e2e8f0',
+    boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
+    transition: 'box-shadow 0.2s ease',
+  },
+  explanationHeader: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: '20px',
+    flexWrap: 'wrap',
+    gap: '16px',
+  },
+  explainButton: {
+    background: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)',
+    color: 'white',
+    border: 'none',
+    padding: '12px 24px',
     borderRadius: '8px',
-    border: '1px solid #ddd',
+    cursor: 'pointer',
+    fontSize: '14px',
+    fontWeight: '600',
+    boxShadow: '0 2px 4px rgba(59, 130, 246, 0.3)',
+    transition: 'all 0.2s ease',
+    display: 'flex',
+    alignItems: 'center',
+    gap: '8px',
+  },
+  explainButtonDisabled: {
+    background: 'linear-gradient(135deg, #9ca3af 0%, #6b7280 100%)',
+    cursor: 'not-allowed',
+    boxShadow: 'none',
+  },
+  errorMessage: {
+    color: '#dc2626',
+    backgroundColor: '#fef2f2',
+    border: '1px solid #fecaca',
+    padding: '16px',
+    borderRadius: '8px',
+    marginBottom: '16px',
+    fontSize: '14px',
+    fontWeight: '500',
+  },
+  explanationContent: {
+    background: 'linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%)',
+    padding: '24px',
+    borderRadius: '12px',
+    border: '1px solid #bae6fd',
+    boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
+  },
+  explanationText: {
+    marginBottom: '20px',
+  },
+  explanationTextParagraph: {
+    margin: '12px 0',
+    lineHeight: '1.7',
+    fontSize: '16px',
+    color: '#1e293b',
+    fontWeight: '400',
+  },
+  explanationMeta: {
+    color: '#64748b',
+    marginBottom: '16px',
+    fontSize: '13px',
+    display: 'flex',
+    alignItems: 'center',
+    gap: '16px',
+    flexWrap: 'wrap',
+  },
+  disclaimer: {
+    color: '#64748b',
+    fontStyle: 'italic',
+    fontSize: '13px',
+    padding: '16px',
+    background: 'rgba(59, 130, 246, 0.1)',
+    borderRadius: '8px',
+    border: '1px solid rgba(59, 130, 246, 0.2)',
+    lineHeight: '1.5',
   },
 };
 

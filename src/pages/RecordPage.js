@@ -43,58 +43,74 @@ const RecordPage = () => {
 
   if (loading) {
     return (
-      <div style={styles.wrapper}>
-        <div style={styles.card}>loading Data...</div>
+      <div style={styles.loadingCard}>
+        <div style={{ fontSize: '2rem', marginBottom: '20px' }}>⏳</div>
+        <h3 style={{ marginBottom: '10px', color: '#374151' }}>Loading Report...</h3>
+        <p style={{ color: '#6b7280' }}>Please wait while we fetch your medical report</p>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div style={styles.wrapper}>
-        <div style={{ ...styles.card, color: 'red' }}>{error}</div>
+      <div style={styles.errorCard}>
+        <div style={{ fontSize: '2rem', marginBottom: '20px' }}>⚠️</div>
+        <h3 style={{ marginBottom: '10px', color: '#ef4444' }}>Error Loading Report</h3>
+        <p style={{ color: '#6b7280' }}>{error}</p>
       </div>
     );
   }
 
   if (recordData.status !== 'Completed') {
     return (
-      <div style={styles.wrapper}>
-        <div style={styles.card}>
-          📄 The report is not ready now, please come back later.
-        </div>
+      <div style={styles.notReadyCard}>
+        <div style={{ fontSize: '2rem', marginBottom: '20px' }}>📄</div>
+        <h3 style={{ marginBottom: '10px', color: '#374151' }}>Report Not Ready</h3>
+        <p style={{ color: '#6b7280' }}>The report is not ready now, please come back later.</p>
       </div>
     );
   }
 
   return (
-    <div style={styles.wrapper}>
-      <div style={styles.card}>
-        <ReportDetails record={recordData} report={reportData} center={centerData} />
-      </div>
-    </div>
+    <ReportDetails record={recordData} report={reportData} center={centerData} />
   );
 };
 
 const styles = {
-  wrapper: {
-    minHeight: '100vh',
-    background: 'linear-gradient(to right, #eef2f3, #8e9eab)',
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: '40px 20px',
-  },
-  card: {
+  loadingCard: {
     width: '100%',
-    maxWidth: '900px',
-    background: '#fff',
-    padding: '30px',
-    borderRadius: '12px',
-    boxShadow: '0 8px 24px rgba(0,0,0,0.15)',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
+    maxWidth: '500px',
+    background: 'white',
+    padding: '48px 40px',
+    borderRadius: '16px',
+    boxShadow: '0 4px 20px rgba(0, 0, 0, 0.1)',
+    border: '1px solid #e2e8f0',
+    textAlign: 'center',
+    margin: '40px auto',
+  },
+  errorCard: {
+    width: '100%',
+    maxWidth: '500px',
+    background: 'white',
+    padding: '48px 40px',
+    borderRadius: '16px',
+    boxShadow: '0 4px 20px rgba(0, 0, 0, 0.1)',
+    border: '1px solid #e2e8f0',
+    textAlign: 'center',
+    color: '#dc2626',
+    margin: '40px auto',
+  },
+  notReadyCard: {
+    width: '100%',
+    maxWidth: '500px',
+    background: 'white',
+    padding: '48px 40px',
+    borderRadius: '16px',
+    boxShadow: '0 4px 20px rgba(0, 0, 0, 0.1)',
+    border: '1px solid #e2e8f0',
+    textAlign: 'center',
+    color: '#64748b',
+    margin: '40px auto',
   },
 };
 
